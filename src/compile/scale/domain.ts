@@ -9,11 +9,11 @@ import {
   SHARED_DOMAIN_OP_INDEX
 } from '../../aggregate';
 import {isBinning, isBinParams, isSelectionExtent} from '../../bin';
-import {getSecondaryRangeChannel, isScaleChannel, ScaleChannel} from '../../channel';
+import {isScaleChannel, ScaleChannel} from '../../channel';
 import {
   binRequiresRange,
   getFieldOrDatumDef,
-  hasBand,
+  hasBandEnd,
   isDatumDef,
   isFieldDef,
   ScaleDatumDef,
@@ -345,18 +345,7 @@ function parseSingleChannelDomain(
         ]);
       }
     }
-  } else if (
-    fieldDef.timeUnit &&
-    util.contains(['time', 'utc'], scaleType) &&
-    hasBand(
-      channel,
-      fieldDef,
-      isUnitModel(model) ? model.encoding[getSecondaryRangeChannel(channel)] : undefined,
-      model.stack,
-      model.markDef,
-      model.config
-    )
-  ) {
+  } else if (fieldDef.timeUnit && util.contains(['time', 'utc'], scaleType) && hasBandEnd(fieldDef)) {
     const data = model.requestDataName(DataSourceType.Main);
     return makeImplicit([
       {

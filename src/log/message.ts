@@ -167,6 +167,10 @@ export function droppingColor(type: 'encoding' | 'property', opt: {fill?: boolea
   }.`;
 }
 
+export function relativeBandSizeNotSupported(sizeChannel: 'width' | 'height') {
+  return `Position range does not support relative band size for ${sizeChannel}.`;
+}
+
 export function emptyFieldDef(fieldDef: unknown, channel: ExtendedChannel) {
   return `Dropping ${stringify(
     fieldDef

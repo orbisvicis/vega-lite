@@ -443,7 +443,20 @@ export interface RectConfig<ES extends ExprRef | SignalRef> extends RectBinSpaci
    * The default size of the bars with discrete dimensions. If unspecified, the default size is  `step-2`, which provides 2 pixel offset between bars.
    * @minimum 0
    */
-  discreteBandSize?: number;
+  discreteBandSize?: number | RelativeBandSize;
+}
+
+export type BandSize = number | RelativeBandSize | SignalRef;
+
+export interface RelativeBandSize {
+  /**
+   * The relative band size.  For example `0.5` means half of the band scale's band width.
+   */
+  band: number;
+}
+
+export function isRelativeBandSize(o: number | RelativeBandSize | ExprRef | SignalRef): o is RelativeBandSize {
+  return o && o['band'] != undefined;
 }
 
 export const BAR_CORNER_RADIUS_INDEX: Partial<
@@ -581,7 +594,12 @@ export interface MarkDefMixins<ES extends ExprRef | SignalRef> {
   radius2Offset?: number | ES;
 }
 
-// Point/Line OverlayMixins are only for area, line, and trail but we don't want to declare multiple types of MarkDef
+export interface RelativeBandSize {
+  /**
+   * The relative band size.  For example `0.5` means half of the band scale's band width.
+   */
+  band: number;
+}
 
 // Point/Line OverlayMixins are only for area, line, and trail but we don't want to declare multiple types of MarkDef
 export interface MarkDef<
@@ -594,7 +612,7 @@ export interface MarkDef<
         BarConfig<ES> & // always extends RectConfig
         LineConfig<ES> &
         TickConfig<ES>,
-      'startAngle' | 'endAngle'
+      'startAngle' | 'endAngle' | 'width' | 'height'
     >,
     MarkDefMixins<ES> {
   // Omit startAngle/endAngle since we use theta/theta2 from Vega-Lite schema to avoid confusion
@@ -608,6 +626,20 @@ export interface MarkDef<
    * @hidden
    */
   endAngle?: number | ES;
+
+  // Replace width / height to include relative band size
+
+  /**
+   * Width of the marks, either a number or a relative band size definition
+   * (`{band: 0.5}`, for example, means half of the band).
+   */
+  width?: number | ES | RelativeBandSize;
+
+  /**
+   * Width of the marks, either a number or a relative band size definition
+   * (`{band: 0.5}`, for example, means half of the band).
+   */
+  height?: number | ES | RelativeBandSize;
 }
 
 const DEFAULT_RECT_BAND_SIZE = 5;
@@ -621,6 +653,7 @@ export const defaultBarConfig: RectConfig<SignalRef> = {
 export const defaultRectConfig: RectConfig<SignalRef> = {
   binSpacing: 0,
   continuousBandSize: DEFAULT_RECT_BAND_SIZE,
+  discreteBandSize: {band: 1},
   timeUnitBandPosition: 0.5
 };
 

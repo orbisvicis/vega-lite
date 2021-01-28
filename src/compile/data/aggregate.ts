@@ -1,13 +1,7 @@
 import {AggregateOp, AggregateTransform as VgAggregateTransform} from 'vega';
 import {isArgmaxDef, isArgminDef} from '../../aggregate';
-import {
-  Channel,
-  getPositionChannelFromLatLong,
-  getSecondaryRangeChannel,
-  isGeoPositionChannel,
-  isScaleChannel
-} from '../../channel';
-import {binRequiresRange, FieldDef, hasBand, isTypedFieldDef, vgField} from '../../channeldef';
+import {Channel, getPositionChannelFromLatLong, isGeoPositionChannel, isScaleChannel} from '../../channel';
+import {binRequiresRange, FieldDef, hasBandEnd, isTypedFieldDef, vgField} from '../../channeldef';
 import * as log from '../../log';
 import {AggregateTransform} from '../../transform';
 import {Dict, duplicate, hash, keys, replacePathInField, setEqual} from '../../util';
@@ -18,13 +12,7 @@ import {DataFlowNode} from './dataflow';
 type Measures = Dict<Partial<Record<AggregateOp, Set<string>>>>;
 
 function addDimension(dims: Set<string>, channel: Channel, fieldDef: FieldDef<string>, model: ModelWithField) {
-  const channelDef2 = isUnitModel(model) ? model.encoding[getSecondaryRangeChannel(channel)] : undefined;
-
-  if (
-    isTypedFieldDef(fieldDef) &&
-    isUnitModel(model) &&
-    hasBand(channel, fieldDef, channelDef2, model.stack, model.markDef, model.config)
-  ) {
+  if (isTypedFieldDef(fieldDef) && isUnitModel(model) && hasBandEnd(fieldDef)) {
     dims.add(vgField(fieldDef, {}));
     dims.add(vgField(fieldDef, {suffix: 'end'}));
 
